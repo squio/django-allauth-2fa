@@ -90,16 +90,7 @@ class BaseRequire2FAMiddleware(MiddlewareMixin):
         raise NotImplementedError("You must implement require_2fa.")
 
     def is_allowed_page(self, request):
-        for urlname in self.allowed_pages:
-            try:
-                if request.path == reverse(urlname):
-                    return True
-            except NoReverseMatch:
-                # The developer may have misconfigured the list of allowed pages.
-                # Let's not outright crash at that point, but inform the developer about their mishap.
-                warnings.warn(
-                    f"NoReverseMatch for {urlname} while checking for pages allowed without 2FA"
-                )
+        return request.resolver_match.url_name in self.allowed_pages
 
     def process_view(self, request, view_func, view_args, view_kwargs):
         # The user is not logged in, do nothing.
